@@ -29,7 +29,7 @@ public class GT_Worldgen_SmallPieces extends GT_Worldgen {
         if (mMeta > 0) {
             int i = 0;
             for (int j = Math.max(1, mAmount / 2 + aRandom.nextInt(mAmount) / 2); i < j; i++) {
-                GT_TileEntity_Ores.setOreBlock(aWorld, aChunkX + aRandom.nextInt(16), mMinY + aRandom.nextInt(Math.max(1, mMaxY - mMinY)), aChunkZ + aRandom.nextInt(16), mMeta, true);
+                GT_TileEntity_Ores.setOreBlock(aWorld, aChunkX+1 + aRandom.nextInt(14), mMinY + aRandom.nextInt(Math.max(1, mMaxY - mMinY)), aChunkZ+1 + aRandom.nextInt(14), mMeta, true);
             }
         }
     }

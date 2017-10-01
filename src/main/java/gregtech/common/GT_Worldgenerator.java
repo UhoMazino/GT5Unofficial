@@ -8,7 +8,6 @@ import gregtech.api.util.GT_Log;
 import gregtech.api.world.GT_Worldgen;
 import gregtech.common.GT_Worldgen_Layer.WorldgenList;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 
 import java.util.Random;
@@ -56,17 +55,15 @@ public class GT_Worldgenerator implements IWorldGenerator {
         generateOreLayerAt(aWorld, r, mX, mZ, xCenter + 3, zCenter - 3);
         generateOreLayerAt(aWorld, r, mX, mZ, xCenter + 3, zCenter + 3);
         long seed = getRandomSeed(aWorld, mX, mZ);
+        mX <<= 4;
+        mZ <<= 4; 
         try {
             for (GT_Worldgen tWorldGen : GregTech_API.sWorldgenList) {
                 r.setSeed(seed);
-                tWorldGen.executeWorldgen(aWorld, r, mX << 4, mZ << 4);
+                tWorldGen.executeWorldgen(aWorld, r, mX, mZ);
             }
         } catch (Throwable e) {
             e.printStackTrace(GT_Log.err);
-        }
-        Chunk tChunk = aWorld.getChunkFromChunkCoords(mX, mZ);
-        if (tChunk != null) {
-            tChunk.isModified = true;
         }
     }
 }
