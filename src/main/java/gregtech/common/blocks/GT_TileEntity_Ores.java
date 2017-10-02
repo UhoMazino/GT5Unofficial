@@ -31,7 +31,7 @@ public class GT_TileEntity_Ores extends TileEntity implements ITexturedTileEntit
     public static byte getHarvestData(short aMetaData, int aBaseBlockHarvestLevel) {
         Materials aMaterial = GregTech_API.sGeneratedMaterials[(aMetaData % 1000)];
         byte tByte = aMaterial == null ? 0 : (byte) Math.max(aBaseBlockHarvestLevel, Math.min(7, aMaterial.mToolQuality - (aMetaData < 16000 ? 0 : 1)));
-        if (GT_Mod.gregtechproxy.mChangeHarvestLevels) {
+        if(GT_Mod.gregtechproxy.mChangeHarvestLevels ){
             tByte = aMaterial == null ? 0 : (byte) Math.max(aBaseBlockHarvestLevel, Math.min(GT_Mod.gregtechproxy.mMaxHarvestLevel, GT_Mod.gregtechproxy.mHarvestLevel[aMaterial.mMetaItemSubID] - (aMetaData < 16000 ? 0 : 1)));
         }
         return tByte;
@@ -51,9 +51,7 @@ public class GT_TileEntity_Ores extends TileEntity implements ITexturedTileEntit
         String BlockName = tBlock.getUnlocalizedName();
         aMetaData += isSmallOre ? 16000 : 0;
         if ((aMetaData > 0) && ((tBlock != Blocks.air) || air)) {
-            if (tBlock.isReplaceableOreGen(aWorld, aX, aY, aZ, Blocks.stone)) {
-
-            } else if (BlockName.equals("tile.igneousStone")) {
+            if (BlockName.equals("tile.igneousStone")) {
                 if (GregTech_API.sBlockOresUb1 != null) {
                     tOreBlock = GregTech_API.sBlockOresUb1;
                     aMetaData += (BlockMeta * 1000);
@@ -71,26 +69,15 @@ public class GT_TileEntity_Ores extends TileEntity implements ITexturedTileEntit
             } else if (BlockName.equals("tile.moonBlock") && (BlockMeta == 3 || BlockMeta == 4)) {
                 if (GregTech_API.sBlockOresGC != null) {
                     switch (BlockMeta) {
-                        case 3:
-                            tOreBlock = GregTech_API.sBlockOresGC;
-                            break;
-                        case 4:
-                            aMetaData += 1000;
-                            tOreBlock = GregTech_API.sBlockOresGC;
-                            break;
+                        case 3: tOreBlock = GregTech_API.sBlockOresGC; break;
+                        case 4: aMetaData += 1000; tOreBlock = GregTech_API.sBlockOresGC; break;
                     }
                 }
             } else if (BlockName.equals("tile.mars") && (BlockMeta == 6 || BlockMeta == 9)) {
                 if (GregTech_API.sBlockOresGC != null) {
                     switch (BlockMeta) {
-                        case 6:
-                            aMetaData += 2000;
-                            tOreBlock = GregTech_API.sBlockOresGC;
-                            break;
-                        case 9:
-                            aMetaData += 3000;
-                            tOreBlock = GregTech_API.sBlockOresGC;
-                            break;
+                        case 6: aMetaData += 2000; tOreBlock = GregTech_API.sBlockOresGC; break;
+                        case 9: aMetaData += 3000; tOreBlock = GregTech_API.sBlockOresGC; break;
                     }
                 }
             } else if (tBlock.isReplaceableOreGen(aWorld, aX, aY, aZ, Blocks.netherrack)) {
@@ -117,7 +104,7 @@ public class GT_TileEntity_Ores extends TileEntity implements ITexturedTileEntit
                 } else {
                     aMetaData += 5000;
                 }
-            } else if (!air) {
+            } else if (!tBlock.isReplaceableOreGen(aWorld, aX, aY, aZ, Blocks.stone) && !air) {
                 return false;
             }
             aWorld.setBlock(aX, aY, aZ, tOreBlock, getHarvestData((short) aMetaData, ((GT_Block_Ores_Abstract) tOreBlock).getBaseBlockHarvestLevel(aMetaData % 16000 / 1000)), 0);
@@ -144,55 +131,50 @@ public class GT_TileEntity_Ores extends TileEntity implements ITexturedTileEntit
     }
 
     public void onUpdated() {
-        if (!worldObj.isRemote && mBlocked) {
-            mBlocked = false;
-            GT_Values.NW.sendPacketToAllPlayersInRange(worldObj, new GT_Packet_Ores(xCoord, (short) yCoord, zCoord, mMetaData), xCoord, zCoord);
+        if ((!this.worldObj.isRemote) && (this.mBlocked)) {
+            this.mBlocked = false;
+            GT_Values.NW.sendPacketToAllPlayersInRange(this.worldObj, new GT_Packet_Ores(this.xCoord, (short) this.yCoord, this.zCoord, this.mMetaData), this.xCoord, this.zCoord);
         }
     }
 
     public Packet getDescriptionPacket() {
-        if (!worldObj.isRemote) {
-            if (mBlocked != (GT_Utility.isOpaqueBlock(worldObj, xCoord + 1, yCoord, zCoord) &&
-                    GT_Utility.isOpaqueBlock(worldObj, xCoord - 1, yCoord, zCoord) &&
-                    GT_Utility.isOpaqueBlock(worldObj, xCoord, yCoord + 1, zCoord) &&
-                    GT_Utility.isOpaqueBlock(worldObj, xCoord, yCoord - 1, zCoord) &&
-                    GT_Utility.isOpaqueBlock(worldObj, xCoord, yCoord, zCoord + 1) &&
-                    GT_Utility.isOpaqueBlock(worldObj, xCoord, yCoord, zCoord - 1))) {
-                GT_Values.NW.sendPacketToAllPlayersInRange(worldObj, new GT_Packet_Ores(xCoord, (short) yCoord, zCoord, mMetaData), xCoord, zCoord);
+        if (!this.worldObj.isRemote) {
+            if ((this.mBlocked == (GT_Utility.isOpaqueBlock(this.worldObj, this.xCoord + 1, this.yCoord, this.zCoord)) && (GT_Utility.isOpaqueBlock(this.worldObj, this.xCoord - 1, this.yCoord, this.zCoord)) && (GT_Utility.isOpaqueBlock(this.worldObj, this.xCoord, this.yCoord + 1, this.zCoord)) && (GT_Utility.isOpaqueBlock(this.worldObj, this.xCoord, this.yCoord - 1, this.zCoord)) && (GT_Utility.isOpaqueBlock(this.worldObj, this.xCoord, this.yCoord, this.zCoord + 1)) && (GT_Utility.isOpaqueBlock(this.worldObj, this.xCoord, this.yCoord, this.zCoord - 1)) ? 1 : 0) == 0) {
+                GT_Values.NW.sendPacketToAllPlayersInRange(this.worldObj, new GT_Packet_Ores(this.xCoord, (short) this.yCoord, this.zCoord, this.mMetaData), this.xCoord, this.zCoord);
             }
         }
         return null;
     }
 
     public void overrideOreBlockMaterial(Block aOverridingStoneBlock, byte aOverridingStoneMeta) {
-        if (this.worldObj == null || blockType == null) return;
-        this.mMetaData = ((short) (int) (this.mMetaData % 1000L + this.mMetaData / 16000L * 16000L));
-        if (aOverridingStoneBlock.isReplaceableOreGen(this.worldObj, this.xCoord, this.yCoord, this.zCoord, Blocks.netherrack)) {
-            this.mMetaData = ((short) (this.mMetaData + 1000));
-        } else if (aOverridingStoneBlock.isReplaceableOreGen(this.worldObj, this.xCoord, this.yCoord, this.zCoord, Blocks.end_stone)) {
-            this.mMetaData = ((short) (this.mMetaData + 2000));
-        } else if (aOverridingStoneBlock.isReplaceableOreGen(this.worldObj, this.xCoord, this.yCoord, this.zCoord, GregTech_API.sBlockGranites)) {
-            if (aOverridingStoneBlock == GregTech_API.sBlockGranites) {
-                if (aOverridingStoneMeta < 8) {
+            if(this.worldObj == null || blockType==null)return;
+            this.mMetaData = ((short) (int) (this.mMetaData % 1000L + this.mMetaData / 16000L * 16000L));
+            if (aOverridingStoneBlock.isReplaceableOreGen(this.worldObj, this.xCoord, this.yCoord, this.zCoord, Blocks.netherrack)) {
+                this.mMetaData = ((short) (this.mMetaData + 1000));
+            } else if (aOverridingStoneBlock.isReplaceableOreGen(this.worldObj, this.xCoord, this.yCoord, this.zCoord, Blocks.end_stone)) {
+                this.mMetaData = ((short) (this.mMetaData + 2000));
+            } else if (aOverridingStoneBlock.isReplaceableOreGen(this.worldObj, this.xCoord, this.yCoord, this.zCoord, GregTech_API.sBlockGranites)) {
+                if (aOverridingStoneBlock == GregTech_API.sBlockGranites) {
+                    if (aOverridingStoneMeta < 8) {
+                        this.mMetaData = ((short) (this.mMetaData + 3000));
+                    } else {
+                        this.mMetaData = ((short) (this.mMetaData + 4000));
+                    }
+                } else {
                     this.mMetaData = ((short) (this.mMetaData + 3000));
-                } else {
-                    this.mMetaData = ((short) (this.mMetaData + 4000));
                 }
-            } else {
-                this.mMetaData = ((short) (this.mMetaData + 3000));
-            }
-        } else if (aOverridingStoneBlock.isReplaceableOreGen(this.worldObj, this.xCoord, this.yCoord, this.zCoord, GregTech_API.sBlockStones)) {
-            if (aOverridingStoneBlock == GregTech_API.sBlockStones) {
-                if (aOverridingStoneMeta < 8) {
+            } else if (aOverridingStoneBlock.isReplaceableOreGen(this.worldObj, this.xCoord, this.yCoord, this.zCoord, GregTech_API.sBlockStones)) {
+                if (aOverridingStoneBlock == GregTech_API.sBlockStones) {
+                    if (aOverridingStoneMeta < 8) {
+                        this.mMetaData = ((short) (this.mMetaData + 5000));
+                    } else {
+                        this.mMetaData = ((short) (this.mMetaData + 6000));
+                    }
+                } else {
                     this.mMetaData = ((short) (this.mMetaData + 5000));
-                } else {
-                    this.mMetaData = ((short) (this.mMetaData + 6000));
                 }
-            } else {
-                this.mMetaData = ((short) (this.mMetaData + 5000));
             }
-        }
-        this.worldObj.setBlockMetadataWithNotify(this.xCoord, this.yCoord, this.zCoord, getHarvestData(this.mMetaData, ((GT_Block_Ores_Abstract) blockType).getBaseBlockHarvestLevel(mMetaData % 16000 / 1000)), 0);
+            this.worldObj.setBlockMetadataWithNotify(this.xCoord, this.yCoord, this.zCoord, getHarvestData(this.mMetaData, ((GT_Block_Ores_Abstract) blockType).getBaseBlockHarvestLevel(mMetaData % 16000 / 1000)), 0);
     }
 
     public void convertOreBlock(World aWorld, int aX, int aY, int aZ) {
@@ -282,8 +264,7 @@ public class GT_TileEntity_Ores extends TileEntity implements ITexturedTileEntit
             }
             if (tRandom.nextInt(3 + aFortune) > 1) {
                 Materials dustMat = ((GT_Block_Ores_Abstract) aDroppedOre).getDroppedDusts()[this.mMetaData / 1000 % 16];
-                if (dustMat != null)
-                    rList.add(GT_OreDictUnificator.get(tRandom.nextInt(3) > 0 ? OrePrefixes.dustImpure : OrePrefixes.dust, dustMat, 1L));
+                if (dustMat != null) rList.add(GT_OreDictUnificator.get(tRandom.nextInt(3) > 0 ? OrePrefixes.dustImpure : OrePrefixes.dust, dustMat, 1L));
             }
         }
         return rList;
